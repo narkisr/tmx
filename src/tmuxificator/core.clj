@@ -40,7 +40,8 @@ Usage:
         base (first windows)]
     (start-tmux profile root base)
     (doseq [{:keys [cmd dir]} (rest windows)]
-      (sh "/usr/bin/tmux" "new-window" "-t" (<< "~{profile}:0") cmd :dir (or dir root)))))
+      (sh "/usr/bin/tmux" "new-window" "-t" (<< "~{profile}:0") cmd :dir (or dir root)))
+    (exit 0)))
 
 (defn -main [& args]
   (try

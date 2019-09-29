@@ -1,6 +1,6 @@
 # Intro
 
-A basic tmux session launch manager
+A simple tmux session launcher
 
 ## Usage
 
