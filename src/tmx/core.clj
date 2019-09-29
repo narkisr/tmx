@@ -34,7 +34,7 @@
      (edn/read-string (slurp f))))
   ([& ks] (get-in (configuration) ks)))
 
-(defn help []
+(defn help- []
   (println "
 Usage:
   tmx start {profile}  - start a tmux profile
@@ -60,8 +60,8 @@ Usage:
     (case (first args)
       "start" (launch (second args))
       "version" (version)
-      "help" (help)
-      nil (help))
+      "help" (help-)
+      nil (help-))
     (catch Exception e
       (stderr e)
       (exit 1))))
