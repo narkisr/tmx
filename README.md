@@ -4,7 +4,28 @@ A basic tmux session launch manager
 
 ## Usage
 
-TBD
+Create ~/.tmx.edn:
+
+```clojure
+{
+ :profiles {
+   :re-core {
+     :root "/home/ronen/code/re-ops/re-core"
+     :windows [
+       {:cmd "lein repl"}
+       {:cmd "sudo docker-compose up elasticsearch" :dir "/home/ronen/code/re-ops/re-dock"}
+     ]
+   }
+ }
+ :terminal "/usr/bin/gnome-terminal"
+}
+```
+
+Launch a profile:
+
+```bash
+$ tmx start re-core
+```
 
 # Copyright and license
 
