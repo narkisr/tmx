@@ -1,10 +1,10 @@
-(ns tmuxificator.core
+(ns tmx.core
   (:gen-class)
   (:require
    [clojure.java.io :as io]
    [clojure.edn :as edn]
    [clojure.core.strint :refer  (<<)]
-   [clojure.java.shell :refer (with-sh-dir sh)]))
+   [clojure.java.shell :refer (sh)]))
 
 (defn stderr [e]
   (binding [*out* *err*]

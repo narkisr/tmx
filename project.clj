@@ -1,4 +1,4 @@
-(defproject tmuxificator "0.1.0"
+(defproject tmx "0.1.0"
   :description "Tmux session management tool"
   :url "https://github.com/narkisr/tmuxificator"
   :license  {:name "Apache License, Version 2.0" :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
@@ -30,7 +30,7 @@
     :dev {
       :set-version {
         :updates [
-            {:path "src/tmuxificator/core.clj" :search-regex #"\"\d+\.\d+\.\d+\""}
+            {:path "src/tmx/core.clj" :search-regex #"\"\d+\.\d+\.\d+\""}
             {:path "README.md" :search-regex #"\d+\.\d+\.\d+"}
         ]
       }
@@ -63,5 +63,5 @@
              "--no-fallback"]
   }
 
-  :main ^:skip-aot tmuxificator.core
+  :main ^:skip-aot tmx.core
 )
