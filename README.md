@@ -4,7 +4,7 @@ A simple tmux session launcher
 
 ## Usage
 
-Download the latest binary release from https://github.com/narkisr/tmx/releases/latest and place under ~/bin/.
+Download the latest binary release from https://github.com/narkisr/tmx/releases/latest and add it to your path.
 
 Create ~/.tmx.edn:
 
