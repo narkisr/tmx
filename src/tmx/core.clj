@@ -1,10 +1,22 @@
 (ns tmx.core
   (:gen-class)
   (:require
+   [clojure.data.json :as json]
+   [clj-http.lite.client :as client]
    [clojure.java.io :as io]
    [clojure.edn :as edn]
    [clojure.core.strint :refer  (<<)]
    [clojure.java.shell :refer (sh)]))
+
+(defn tags [user repo]
+  (json/read-str
+   (:body (client/get (<< "https://api.github.com/repos/~{user}/~{repo}/tags"))) :key-fn keyword))
+
+(defn version []
+  (let [current  "0.1.0" last-version (:name (last (sort-by :name (tags "narkisr" "tmx"))))]
+    (if-not (= current last-version)
+      (println (<< "tmx version is ~{current} the latest version is ~{last-version} please upgrade"))
+      (println "tmx" current))))
 
 (defn stderr [e]
   (binding [*out* *err*]
@@ -47,6 +59,7 @@ Usage:
   (try
     (case (first args)
       "start" (launch (second args))
+      "version" (version)
       "help" (help)
       nil (help))
     (catch Exception e

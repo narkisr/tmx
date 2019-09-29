@@ -16,6 +16,12 @@
       [org.clojure/tools.reader "1.3.2"]
 
       [com.taoensso/timbre "4.10.0"]
+
+      [org.martinklepsch/clj-http-lite "0.4.1"]
+      [org.clojure/data.json "0.2.6"]
+
+      [org.bouncycastle/bcprov-jdk15on "1.61"]
+      [org.bouncycastle/bctls-jdk15on "1.61"]
     ]
 
   :plugins [
@@ -55,12 +61,13 @@
   :native-image {
       :name "tmx"
       :graal-bin "/opt/graalvm-ce-19.2.0.1/bin/native-image"
-      :opts ["-H:EnableURLProtocols=http"
-             "--report-unsupported-elements-at-runtime"
-             "--enable-https"
-             "--initialize-at-build-time"
-             "--verbose"
-             "--no-fallback"]
+      :opts [
+        "--no-server"
+        "--report-unsupported-elements-at-runtime"
+        "--initialize-at-build-time"
+        "-J-Djava.security.properties=java.security.overrides"
+        "-H:EnableURLProtocols=https"
+        "--verbose"]
   }
 
   :main ^:skip-aot tmx.core
