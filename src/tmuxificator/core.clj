@@ -50,10 +50,4 @@ Usage:
       nil (help))
     (catch Exception e
       (stderr e)
-      (exit
-
-
-
-       1))))
-
-
+      (exit 1))))
