@@ -4,6 +4,8 @@ A simple tmux session launcher
 
 ## Usage
 
+Download the latest binary release from https://github.com/narkisr/tmx/releases/latest and place under ~/bin/.
+
 Create ~/.tmx.edn:
 
 ```clojure
