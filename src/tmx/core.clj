@@ -1,12 +1,14 @@
 (ns tmx.core
   (:gen-class)
   (:require
+   [clojure.string :as s]
    [clojure.data.json :as json]
    [clj-http.lite.client :as client]
    [clojure.java.io :as io]
    [clojure.edn :as edn]
    [clojure.core.strint :refer  (<<)]
-   [clojure.java.shell :refer (sh)]))
+   [clojure.java.shell :refer (sh)])
+  (:import java.lang.Integer))
 
 (defn tags [user repo]
   (json/read-str
@@ -42,8 +44,27 @@ Usage:
   tmx help            - print this help message.
 "))
 
+(def tmux "/usr/bin/tmux")
+
+(defn list-sessions []
+  (letfn [(into-session [st]
+            (let [[k data] (s/split st #":\s")
+                  c (Integer/parseInt (last (re-find #"(\d+) windows.*" data)))]
+              {(keyword k) {:windows c :attached (s/includes? data "(attached)")}}))]
+    (let [{:keys [out exit]} (sh tmux "ls")]
+      (when (= exit 0)
+        (apply merge (map into-session (s/split out #"\n")))))))
+
 (defn start-tmux [profile root {:keys [dir cmd]}]
-  (sh (configuration :terminal) "-e" (<< "/usr/bin/tmux new-session -s ~{profile} ~{cmd}") :dir (or dir root)))
+  (sh (configuration :terminal) "-e" (<< "~{tmux} new-session -s ~{profile} ~{cmd}") :dir (or dir root)))
+
+(defn session-launched? [profile]
+  (contains? (list-sessions) (keyword profile)))
+
+(defn wait-for-session [c profile]
+  (when-not (and (session-launched? profile) (< c 3))
+    (Thread/sleep 1000)
+    (wait-for-session (+ 1 c) profile)))
 
 (defn launch
   [profile]
@@ -51,14 +72,17 @@ Usage:
   (let [{:keys [root windows]} (configuration :profiles (keyword profile))
         base (first windows)]
     (start-tmux profile root base)
+    (wait-for-session 0 profile)
+    (when-not (session-launched? profile)
+      (stderr "failed to start session")
+      (exit 1))
     (doseq [{:keys [cmd dir]} (rest windows)]
-      (sh "/usr/bin/tmux" "new-window" "-t" (<< "~{profile}:0") cmd :dir (or dir root)))
-    (exit 0)))
+      (sh tmux "new-window" "-t" (<< "~{profile}:0") cmd :dir (or dir root)))))
 
 (defn -main [& args]
   (try
     (case (first args)
-      "start" (launch (second args))
+      "start" (do (launch (second args)) (exit 0))
       "version" (version)
       "help" (help-)
       nil (help-))
