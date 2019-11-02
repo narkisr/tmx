@@ -67,7 +67,8 @@
     (wait-for-session (+ 1 c) profile)))
 
 (defn layouts [k]
-  (k {:verticle (fn [_] (list "split-window" "-v" ";"))}))
+  (k {:verticle (fn [_] (list "split-window" "-v" ";"))
+      :horizontal (fn [_] (list "split-window" "-h" ";"))}))
 
 (defn send-keys [new? {:keys [cmd]}]
   (let [cmd' (if new? (<< "\"~{cmd}\"") cmd)]
