@@ -20,6 +20,9 @@
 
       ; cli parsing
       [cli-matic "0.3.8"]
+
+      ; spec validation errors
+      [expound "0.7.2"]
     ]
 
   :plugins [

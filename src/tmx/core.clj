@@ -1,14 +1,14 @@
 (ns tmx.core
   (:gen-class)
   (:require
-   [clojure.string :refer (join)]
+   [tmx.rendering :refer (render)]
+   [tmx.config :refer (configuration)]
+   [tmx.common :refer (stderr exit)]
+   [clojure.string :as s :refer (join split)]
    [clojure.spec.alpha :as spec]
    [cli-matic.core :refer (run-cmd)]
-   [clojure.string :as s]
    [clojure.data.json :as json]
    [clj-http.lite.client :as client]
-   [clojure.java.io :as io]
-   [clojure.edn :as edn]
    [clojure.core.strint :refer  (<<)]
    [clojure.java.shell :refer (sh)])
   (:import java.lang.Integer))
@@ -23,22 +23,6 @@
       (println (<< "tmx version is ~{current} the latest version is ~{last-version} please upgrade"))
       (println "tmx" current))))
 
-(defn stderr [e]
-  (binding [*out* *err*]
-    (println e)))
-
-(defn exit [c]
-  (System/exit c))
-
-(defn configuration
-  ([]
-   (let [f (str (System/getProperty "user.home") "/.tmx.edn")]
-     (when-not (.exists (io/file f))
-       (stderr (<< "~{f} configuration file is missing"))
-       (exit 1))
-     (edn/read-string (slurp f))))
-  ([& ks] (get-in (configuration) ks)))
-
 (def tmux "/usr/bin/tmux")
 
 (defn terminal [cmd root]
@@ -46,12 +30,12 @@
 
 (defn list-sessions []
   (letfn [(into-session [st]
-            (let [[k data] (s/split st #":\s")
+            (let [[k data] (split st #":\s")
                   c (Integer/parseInt (last (re-find #"(\d+) windows.*" data)))]
               {(keyword k) {:windows c :attached (s/includes? data "(attached)")}}))]
     (let [{:keys [out exit]} (sh tmux "ls")]
       (when (= exit 0)
-        (apply merge (map into-session (s/split out #"\n")))))))
+        (apply merge (map into-session (split out #"\n")))))))
 
 (defn start-tmux [profile root cmd new?]
   (if new?
@@ -65,30 +49,6 @@
   (when-not (and (session-launched? profile) (< c 3))
     (Thread/sleep 1000)
     (wait-for-session (+ 1 c) profile)))
-
-(defn layouts [k]
-  (k {:verticle (fn [_] (list "split-window" "-v" ";"))
-      :horizontal (fn [_] (list "split-window" "-h" ";"))}))
-
-(defn send-keys [new? {:keys [cmd]}]
-  (let [cmd' (if new? (<< "\"~{cmd}\"") cmd)]
-    (list "send-keys" cmd' "C-m" ";")))
-
-(defn new-window [cmd root]
-  (concat (list "new-window" "-c" root ";") cmd))
-
-(defn reneder-window [{:keys [layout panes]} new?]
-  (butlast
-   (interleave
-    (map (partial send-keys new?) panes)
-    (map (layouts layout) (range (count panes))))))
-
-(defn render
-  [windows root new?]
-  (flatten
-   (cons (reneder-window (first windows) new?)
-         (map (fn [{:keys [dir] :as w}]
-                (new-window (reneder-window w new?) (or dir root))) (rest windows)))))
 
 (defn load-profile [profile]
   (configuration :profiles (keyword profile)))
