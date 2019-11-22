@@ -18,7 +18,9 @@
 (defn select-layout [k]
   (list "select-layout" (name k) ";"))
 
-(defn reneder-window [{:keys [layout split panes]} new?]
+(defn reneder-window
+  "Render tmux commands for a window as a string"
+  [{:keys [layout split panes]} new?]
   (concat
    (butlast
     (interleave

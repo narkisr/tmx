@@ -65,6 +65,14 @@
     (when-not new?
       (println profile))))
 
+(defn output-rendering
+  [{:keys [p]}]
+  {:pre [(string? p)]}
+  (let [{:keys [root windows]} (load-profile p)
+        rendering (render windows root false)]
+    (doseq [line (split (join " " rendering) #";\s?")]
+      (println line))))
+
 (defn launch-n-exit [{:keys [p n]}]
   (launch p (Boolean/parseBoolean n))
   (exit 0))
@@ -84,6 +92,11 @@
                                 {:option "n" :as "New window" :type :string :default "false" :spec ::bool}]
                   :runs        launch-n-exit}
 
+                 {:command     "render"
+                  :description "Output the rendering of the select profile"
+                  :opts        [{:option "p" :as "Profile" :type :string}]
+                  :runs        output-rendering}
+
                  {:command     "version"
                   :description "Show version and check if its the latest"
                   :runs        version}]})
@@ -94,3 +107,6 @@
     (catch Exception e
       (stderr e)
       (exit 1))))
+
+(comment
+  (output-rendering {:p "re-core"}))
