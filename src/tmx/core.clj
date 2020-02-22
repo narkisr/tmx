@@ -25,9 +25,6 @@
 
 (def tmux "/usr/bin/tmux")
 
-(defn terminal [cmd root]
-  (sh (configuration :terminal) "-e" cmd :dir root))
-
 (defn list-sessions []
   (letfn [(into-session [st]
             (let [[k data] (split st #":\s")
@@ -38,9 +35,13 @@
         (apply merge (map into-session (split out #"\n")))))))
 
 (defn start-tmux [profile root cmd new?]
-  (if new?
-    (terminal (<< "~{tmux} new-session -s ~{profile} \\; ~(join \" \" cmd)") root)
-    (apply sh (concat (list tmux  "new-session" "-d" "-s" profile ";") cmd (list :dir root)))))
+  (try
+    (if new?
+      (sh (configuration :terminal) "-e" (<< "~{tmux} new-session -s ~{profile} \\; ~(join \" \" cmd)") :dir root)
+      (apply sh (concat (list tmux  "new-session" "-d" "-s" profile ";") cmd (list :dir root))))
+    (catch Exception e
+      (stderr (.getMessage e))
+      (exit 1))))
 
 (defn session-launched? [profile]
   (contains? (list-sessions) (keyword profile)))
@@ -58,7 +59,10 @@
   {:pre [(string? profile)]}
   (let [{:keys [root windows]} (load-profile profile)
         rendering (render windows root new?)]
-    (start-tmux profile root rendering new?)
+    (let [{:keys [err out code]} (start-tmux profile root rendering new?)]
+      (when-not (= 0 code)
+        (stderr out)
+        (exit 1)))
     (when-not (session-launched? profile)
       (stderr "Failed to launch session")
       (exit 1))

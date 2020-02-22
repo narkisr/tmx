@@ -7,8 +7,12 @@ if test -n "$JAVA_HOME"; then
 fi
 
 if [[ "$1" == "start" ]] ; then
-   out=`java $java_args -jar $MYSELF "$@"`
-  if [[ "$out" != "" ]] ; then
+  out=`java $java_args -jar $MYSELF "$@"`
+  retVal=$?
+  if [ $retVal -ne 0 ]; then
+    echo $out
+    exit $retVal 
+  elif [[ "$out" != "" ]] ; then
    tmux attach -t $out
   fi
 else
