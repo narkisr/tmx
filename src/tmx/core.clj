@@ -3,7 +3,7 @@
   (:require
    [tmx.rendering :refer (render)]
    [tmx.config :refer (configuration)]
-   [tmx.common :refer (stderr exit)]
+   [tmx.common :as c]
    [clojure.string :as s :refer (join split)]
    [clojure.spec.alpha :as spec]
    [cli-matic.core :refer (run-cmd)]
@@ -40,8 +40,8 @@
       (sh (configuration :terminal) "-e" (<< "~{tmux} new-session -s ~{profile} \\; ~(join \" \" cmd)") :dir root)
       (apply sh (concat (list tmux  "new-session" "-d" "-s" profile ";") cmd (list :dir root))))
     (catch Exception e
-      (stderr (.getMessage e))
-      (exit 1))))
+      (c/stderr (.getMessage e))
+      (c/exit 1))))
 
 (defn session-launched? [profile]
   (contains? (list-sessions) (keyword profile)))
@@ -59,13 +59,13 @@
   {:pre [(string? profile)]}
   (let [{:keys [root windows]} (load-profile profile)
         rendering (render windows root new?)]
-    (let [{:keys [err out code]} (start-tmux profile root rendering new?)]
-      (when-not (= 0 code)
-        (stderr out)
-        (exit 1)))
+    (let [{:keys [err out exit] :as m} (start-tmux profile root rendering new?)]
+      (when-not (= 0 exit)
+        (c/stderr err)
+        (c/exit 1)))
     (when-not (session-launched? profile)
-      (stderr "Failed to launch session")
-      (exit 1))
+      (c/stderr "Failed to launch session")
+      (c/exit 1))
     (when-not new?
       (println profile))))
 
@@ -79,7 +79,7 @@
 
 (defn launch-n-exit [{:keys [p n]}]
   (launch p (Boolean/parseBoolean n))
-  (exit 0))
+  (c/exit 0))
 
 (spec/def ::bool #{"true" "false"})
 
@@ -109,8 +109,8 @@
   (try
     (run-cmd args cli)
     (catch Exception e
-      (stderr e)
-      (exit 1))))
+      (c/stderr e)
+      (c/exit 1))))
 
 (comment
   (output-rendering {:p "re-core"}))
