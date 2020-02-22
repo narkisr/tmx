@@ -1,6 +1,6 @@
 # Intro
 
-A simple tmux session launcher
+A simple tmux session launcher, this tool is working but is still in Alpha state.
 
 ## Usage
 
@@ -28,7 +28,6 @@ Create ~/.tmx.edn:
      ]
    }
  }
-
 ```
 
 Launch a profile:
@@ -37,9 +36,15 @@ Launch a profile:
 $ tmx start --p re-core --n false
 ```
 
+Preview layout rendering:
+
+```bash
+$ tmx render --p re-core
+```
+
 # Copyright and license
 
-Copyright [2019] [Ronen Narkis]
+Copyright [2020] [Ronen Narkis]
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
