@@ -1,4 +1,4 @@
-(defproject tmx "0.1.0"
+(defproject tmx "0.2.0"
   :description "Tmux session management tool"
   :url "https://github.com/narkisr/tmuxificator"
   :license  {:name "Apache License, Version 2.0" :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
