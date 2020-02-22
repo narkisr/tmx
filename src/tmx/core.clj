@@ -18,7 +18,7 @@
    (:body (client/get (<< "https://api.github.com/repos/~{user}/~{repo}/tags"))) :key-fn keyword))
 
 (defn version [_]
-  (let [current  "0.1.0" last-version (:name (last (sort-by :name (tags "narkisr" "tmx"))))]
+  (let [current "0.2.0" last-version (:name (last (sort-by :name (tags "narkisr" "tmx"))))]
     (if-not (= current last-version)
       (println (<< "tmx version is ~{current} the latest version is ~{last-version} please upgrade"))
       (println "tmx" current))))
@@ -86,7 +86,7 @@
 (def cli
   {:app {:command     "tmx"
          :description "tmux session managment"
-         :version     "0.1.0"}
+         :version     "0.2.0"}
 
    :global-opts []
 
