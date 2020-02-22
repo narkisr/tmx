@@ -11,7 +11,7 @@ if [[ "$1" == "start" ]] ; then
   retVal=$?
   if [ $retVal -ne 0 ]; then
     echo $out
-    exit $retVal 
+    exit $retVal
   elif [[ "$out" != "" ]] ; then
    tmux attach -t $out
   fi
