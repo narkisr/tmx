@@ -10,24 +10,27 @@ Create ~/.tmx.edn:
 
 ```clojure
 {
- :re-core {
-   :root "/home/ronen/code/re-ops/re-core"
-   :windows [
-      {
+ :profiles {
+   :re-core {
+     :root "/home/ronen/code/re-ops/re-core"
+     :windows [
+       {
         :layout :even-horizontal
         :split :horizontal
         :dir "/home/ronen/code/re-ops/re-core"
-        :panes [{:cmd "lein repl"} {:cmd "v project.clj"} {:cmd "tail -f re-core.log"}]
-      }
-      {
+        :panes [{:cmd "lein repl"}]
+       }
+       {
         :layout :tiled
         :split :verticle
         :dir "/home/ronen/code/re-ops/re-dock"
-        :panes [{:cmd "docker-compose up elasticsearch"}]
-      }
+        :panes [{:cmd "virsh start elasticsearch-dev"}]
+       }
      ]
    }
  }
+ :terminal "/usr/bin/gnome-terminal"
+}
 ```
 
 Launch a profile:
